@@ -1,0 +1,41 @@
+FUNCTION ClassReport(FileName : STRING) RETURNS STRING
+  DECLARE Line : STRING
+  DECLARE TotalMarks : REAL
+  DECLARE TotalStudents : INTEGER
+  DECLARE MaxMark : REAL
+  DECLARE MaxStudentSurname : STRING
+
+  TotalMarks<-0
+  TotalStudents<-0
+  MaxMark<-0
+
+  OPENFILE FileName FOR READ
+  WHILE NOT EOF(FileName)
+    DECLARE Data : ARRAY[1:3] OF STRING
+
+    READFILE FileName, Line
+
+    // the function SPLIT takes a string and splits it into an array by a certain symbol
+    // e.g. SPLIT("I-Love-You", "-") would return ["I", "Love", "You"]
+    Data<-SPLIT(Line, ",")
+    
+    DECLARE FName : Data[1]
+    DECLARE LName : Data[2]
+    DECLARE Mark : Data[3]
+
+    IF
+      Mark > MaxMark
+      THEN
+        MaxMark<-Mark
+        MaxStudentSurname<-LName
+    ENDIF
+
+    TotalMarks<-TotalMarks + Mark
+    TotalStudents<-TotalStudents + 1
+  ENDWHILE
+
+  DECLARE Avg : TotalMarks / TotalStudents
+  OUTPUT "Average mark: " & NUM_TO_STR(Avg) & "%"
+
+  RETURN MaxStudentSurname & ", " & NUM_TO_STR(MaxMark)
+ENDFUNCTION
